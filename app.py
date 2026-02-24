@@ -19,7 +19,7 @@ from models import (
     WEEKDAY_NAMES,
 )
 from fes_scraper import scrape_all, fetch_available_dates, fetch_street_suggestions, fetch_housenumbers
-from config import SCRAPE_INTERVAL_HOURS
+from config import SCRAPE_INTERVAL_HOURS, FES_BOOKING_PAGE_URL
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -50,6 +50,7 @@ def inject_globals():
         "today": date.today().isoformat(),
         "all_stadtteile": FRANKFURTER_STADTTEILE,
         "weekday_names": WEEKDAY_NAMES,
+        "fes_booking_page_url": FES_BOOKING_PAGE_URL,
     }
 
 
