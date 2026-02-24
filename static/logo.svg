@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-label="Sperrmüll Frankfurt">
+  <rect width="48" height="48" rx="11" fill="#ea580c"/>
+  <rect x="7" y="10" width="34" height="13" rx="4" fill="white"/>
+  <rect x="10" y="23" width="28" height="10" rx="3" fill="white"/>
+  <rect x="6" y="18" width="8" height="15" rx="3.5" fill="white"/>
+  <rect x="34" y="18" width="8" height="15" rx="3.5" fill="white"/>
+  <rect x="12" y="33" width="4" height="5" rx="1.5" fill="white" opacity="0.85"/>
+  <rect x="32" y="33" width="4" height="5" rx="1.5" fill="white" opacity="0.85"/>
+</svg>

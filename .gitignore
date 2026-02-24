@@ -1,0 +1,14 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.env
+.venv/
+
+# Lokale DB (wird beim Scrape neu aufgebaut; auf Fly Volume)
+data/sperrmuell.db
+
+# OS
+.DS_Store

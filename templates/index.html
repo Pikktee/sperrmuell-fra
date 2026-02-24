@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block title %}Sperrmüll-Termine Frankfurt am Main{% endblock %}
+
+{% block content %}
+{# Hero + Adresssuche im Zentrum #}
+<section class="mb-12">
+    <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-2">Wann wird bei Ihnen Sperrmüll abgeholt?</h1>
+    <p class="text-slate-600 text-lg mb-8 max-w-xl">Geben Sie Ihre Adresse ein – sofort sehen Sie den Abholtag und die nächsten Termine für Frankfurt am Main.</p>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm ring-1 ring-slate-900/5" id="search-card">
+        <form method="get" action="{{ url_for('index') }}" class="space-y-4" id="lookup-form">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                <div class="sm:col-span-7 relative">
+                    <label for="street" class="block text-sm font-medium text-slate-700 mb-1.5">Straße</label>
+                    <input type="text" name="street" id="street" value="{{ street }}"
+                           placeholder="z.B. Westendstr."
+                           autocomplete="off"
+                           class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow">
+                    <ul id="street-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-20 hidden" role="listbox" aria-label="Straßenvorschläge"></ul>
+                </div>
+                <div class="sm:col-span-3 relative">
+                    <label for="housenumber" class="block text-sm font-medium text-slate-700 mb-1.5">Hausnummer</label>
+                    <input type="text" name="housenumber" id="housenumber" value="{{ housenumber }}"
+                           placeholder="z.B. 100"
+                           autocomplete="off"
+                           class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow">
+                    <ul id="housenumber-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-20 hidden" role="listbox" aria-label="Hausnummernvorschläge"></ul>
+                </div>
+                <div class="sm:col-span-2 flex items-end">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-3.5 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors shadow-sm">
+                        Suchen
+                    </button>
+                </div>
+            </div>
+            <p class="text-sm text-slate-500">Vorschläge erscheinen beim Tippen – wie beim FES-Formular.</p>
+        </form>
+    </div>
+</section>
+
+<script>
+(function() {
+    const streetInput = document.getElementById('street');
+    const streetList = document.getElementById('street-suggestions');
+    const housenumberInput = document.getElementById('housenumber');
+    const housenumberList = document.getElementById('housenumber-suggestions');
+
+    let streetDebounce = null;
+    let housenumberDebounce = null;
+
+    function showStreetSuggestions(items) {
+        streetList.innerHTML = '';
+        if (!items.length) { streetList.classList.add('hidden'); return; }
+        items.forEach(function(name) {
+            const li = document.createElement('li');
+            li.textContent = name;
+            li.setAttribute('role', 'option');
+            li.className = 'px-4 py-2.5 cursor-pointer hover:bg-primary-50 text-slate-800';
+            li.addEventListener('click', function() {
+                streetInput.value = name;
+                streetList.classList.add('hidden');
+                streetList.innerHTML = '';
+                housenumberInput.focus();
+                loadHousenumbers(name);
+            });
+            streetList.appendChild(li);
+        });
+        streetList.classList.remove('hidden');
+    }
+
+    function showHousenumberSuggestions(items) {
+        housenumberList.innerHTML = '';
+        if (!items.length) { housenumberList.classList.add('hidden'); return; }
+        items.forEach(function(num) {
+            const li = document.createElement('li');
+            li.textContent = num;
+            li.setAttribute('role', 'option');
+            li.className = 'px-4 py-2.5 cursor-pointer hover:bg-primary-50 text-slate-800';
+            li.addEventListener('click', function() {
+                housenumberInput.value = num;
+                housenumberList.classList.add('hidden');
+                housenumberList.innerHTML = '';
+            });
+            housenumberList.appendChild(li);
+        });
+        housenumberList.classList.remove('hidden');
+    }
+
+    function loadStreets(q) {
+        if (q.length < 2) { showStreetSuggestions([]); return; }
+        fetch('{{ url_for("api_streets") }}?q=' + encodeURIComponent(q))
+            .then(function(r) { return r.json(); })
+            .then(function(data) { showStreetSuggestions(data.streets || []); })
+            .catch(function() { showStreetSuggestions([]); });
+    }
+
+    function loadHousenumbers(street) {
+        if (!street) { showHousenumberSuggestions([]); return; }
+        fetch('{{ url_for("api_housenumbers") }}?street=' + encodeURIComponent(street))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var list = data.housenumbers || [];
+                var q = housenumberInput.value.trim().toLowerCase();
+                if (q) list = list.filter(function(n) { return String(n).toLowerCase().indexOf(q) !== -1; });
+                showHousenumberSuggestions(list);
+            })
+            .catch(function() { showHousenumberSuggestions([]); });
+    }
+
+    streetInput.addEventListener('input', function() {
+        clearTimeout(streetDebounce);
+        var q = streetInput.value.trim();
+        streetDebounce = setTimeout(function() { loadStreets(q); }, 280);
+    });
+    streetInput.addEventListener('focus', function() {
+        var q = streetInput.value.trim();
+        if (q.length >= 2) loadStreets(q);
+    });
+    streetInput.addEventListener('blur', function() {
+        setTimeout(function() { streetList.classList.add('hidden'); }, 200);
+    });
+
+    housenumberInput.addEventListener('focus', function() {
+        var s = streetInput.value.trim();
+        if (s) loadHousenumbers(s);
+    });
+    housenumberInput.addEventListener('input', function() {
+        clearTimeout(housenumberDebounce);
+        var s = streetInput.value.trim();
+        housenumberDebounce = setTimeout(function() {
+            if (!s) { showHousenumberSuggestions([]); return; }
+            loadHousenumbers(s);
+        }, 280);
+    });
+    housenumberInput.addEventListener('blur', function() {
+        setTimeout(function() { housenumberList.classList.add('hidden'); }, 200);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!streetList.contains(e.target) && e.target !== streetInput) streetList.classList.add('hidden');
+        if (!housenumberList.contains(e.target) && e.target !== housenumberInput) housenumberList.classList.add('hidden');
+    });
+})();
+</script>
+
+{% if lookup_result %}
+<section class="mb-12" aria-live="polite">
+    {% if lookup_result.success %}
+    <div class="bg-white rounded-2xl border border-emerald-200 p-6 sm:p-8 shadow-sm ring-1 ring-emerald-900/5">
+        <h2 class="text-xl font-semibold text-slate-900 mb-1">{{ lookup_result.street }} {{ lookup_result.housenumber }}</h2>
+        {% if lookup_result.is_siedlungsabfuhr %}
+        <p class="text-emerald-800 font-medium mb-3">Siedlungsabfuhr – fester Sperrmüllplatz, Abholung alle vier Wochen.</p>
+        <p class="text-slate-700"><strong>Nächste Abholtermine:</strong>
+            {% for d in lookup_result.next_dates %}
+            {{ d | short_date }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% if lookup_result.zip_code %}
+        <p class="text-slate-500 text-sm mt-2">PLZ {{ lookup_result.zip_code }}</p>
+        {% endif %}
+        {% else %}
+        <p class="text-slate-700 font-medium mb-2">Sperrmüll wird <strong>{{ lookup_result.weekday_name }}s</strong> abgeholt.</p>
+        <p class="text-slate-700"><strong>Nächste Abholtermine:</strong>
+            {% for d in lookup_result.next_dates %}
+            {{ d | short_date }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% if lookup_result.zip_code %}
+        <p class="text-slate-500 text-sm mt-2">PLZ {{ lookup_result.zip_code }}</p>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+        <h2 class="text-lg font-semibold text-amber-900 mb-1">Kein Ergebnis für {{ lookup_result.street }} {{ lookup_result.housenumber }}</h2>
+        <p class="text-amber-800">{{ lookup_result.error }}</p>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{# Stadtteilübersicht – zweitrangig #}
+<section class="border-t border-slate-200 pt-10">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+            <h2 class="text-lg font-semibold text-slate-800">Nach Wochentag oder Stadtteil</h2>
+            <p class="text-slate-500 text-sm mt-0.5">Falls Sie keine konkrete Adresse haben.</p>
+        </div>
+        <a href="{{ url_for('termine') }}" class="text-sm font-medium text-primary-600 hover:text-primary-700">Alle Termine anzeigen →</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {% for wd in range(7) %}
+        {% set entries = by_weekday.get(wd, []) %}
+        {% if entries %}
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:border-primary-200 hover:shadow transition-all">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary-100 text-primary-700 text-xs font-bold shrink-0">
+                    {{ weekday_names[wd][:2] }}
+                </span>
+                <h3 class="font-semibold text-slate-800">{{ weekday_names[wd] }}</h3>
+                <span class="ml-auto text-xs text-slate-400 font-medium">{{ entries|length }} Stadtteile</span>
+            </div>
+            <ul class="text-sm text-slate-600 space-y-1.5">
+                {% for e in entries[:8] %}
+                <li><a href="{{ url_for('termine', stadtteil=e.stadtteil) }}" class="hover:text-primary-600 transition-colors">{{ e.stadtteil }}</a></li>
+                {% endfor %}
+                {% if entries|length > 8 %}
+                <li class="text-slate-400 text-xs">+ {{ entries|length - 8 }} weitere</li>
+                {% endif %}
+            </ul>
+            <p class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-400">
+                Nächster Termin: {{ next_dates_for_weekday(wd, 1) | map('short_date') | join }}
+            </p>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <h3 class="text-sm font-semibold text-slate-700 mb-2">Stadtteil wählen</h3>
+    <div class="flex flex-wrap gap-2">
+        {% for st in stadtteile_with_data %}
+        <a href="{{ url_for('termine', stadtteil=st) }}"
+           class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:bg-primary-50 hover:border-primary-200 hover:text-primary-700 transition-colors">
+            {{ st }}
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+{% if siedlungsabfuhr %}
+<section class="mt-10 pt-8 border-t border-slate-200">
+    <h2 class="text-lg font-semibold text-slate-800 mb-2">Siedlungsabfuhr</h2>
+    <p class="text-slate-600 text-sm mb-4">Fester Sperrmüllplatz, Abholung alle vier Wochen. Den genauen Platz nennt die FES unter 0800 2008007-10.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {% for e in siedlungsabfuhr %}
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div class="font-medium text-slate-900">{{ e.stadtteil }}</div>
+            <p class="text-sm text-slate-600 mt-0.5">Nächste Termine: {% for d in next_dates_for_fixed_date(e.fixed_date, 4) %}{{ d | short_date }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="mt-12 pt-8 border-t border-slate-200">
+    <div class="bg-slate-100 rounded-xl p-5 text-sm text-slate-600">
+        <p class="font-medium text-slate-700 mb-2">Kurz & knapp</p>
+        <ul class="space-y-1">
+            <li><strong>Ab wann rausstellen?</strong> Frühestens ab 15:30 Uhr am Vortag.</li>
+            <li><strong>Abholung:</strong> Ab 6:00 Uhr. Daten von der FES, regelmäßig aktualisiert.</li>
+        </ul>
+        <p class="mt-3"><a href="https://www.fes-frankfurt.de/services/sperrmuell" target="_blank" rel="noopener" class="text-primary-600 hover:underline">Sperrmüll bei der FES anmelden</a></p>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,242 @@
+[
+  {
+    "stadtteil": "Altstadt",
+    "street": "Domstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Bahnhofsviertel",
+    "street": "Kaiserstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Bergen-Enkheim",
+    "street": "Marktstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Berkersheim",
+    "street": "Alt Berkersheim",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Bockenheim",
+    "street": "Leipziger Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Bonames",
+    "street": "Königsteiner Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Bornheim",
+    "street": "Berger Str.",
+    "number": "10"
+  },
+  {
+    "stadtteil": "Dornbusch",
+    "street": "Eschersheimer Landstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Eckenheim",
+    "street": "Eckenheimer Landstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Eschersheim",
+    "street": "Eschersheimer Landstr.",
+    "number": "100"
+  },
+  {
+    "stadtteil": "Fechenheim",
+    "street": "Hanauer Landstr.",
+    "number": "100"
+  },
+  {
+    "stadtteil": "Frankfurter Berg",
+    "street": "Am Frankfurter Berg",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Gallus",
+    "street": "Mainzer Landstr.",
+    "number": "200"
+  },
+  {
+    "stadtteil": "Ginnheim",
+    "street": "Ginnheimer Landstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Griesheim",
+    "street": "Griesheimer Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Gutleutviertel",
+    "street": "Gutleutstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Harheim",
+    "street": "Harheimer Weg",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Hausen",
+    "street": "Ludwig-Landmann-Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Heddernheim",
+    "street": "Heddernheimer Landstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Höchst",
+    "street": "Bolongarostr.",
+    "number": "50"
+  },
+  {
+    "stadtteil": "Innenstadt",
+    "street": "Zeil",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Kalbach-Riedberg",
+    "street": "Riedbergplatz",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Kalbach-Riedberg",
+    "street": "Altenhöferallee",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Nied",
+    "street": "Nieder Kirchweg",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Nieder-Erlenbach",
+    "street": "Alt Nieder-Erlenbach",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Nieder-Eschbach",
+    "street": "Alt Nieder-Eschbach",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Niederrad",
+    "street": "Lyoner Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Niederursel",
+    "street": "Heddernheimer Landstr.",
+    "number": "100"
+  },
+  {
+    "stadtteil": "Nordend-Ost",
+    "street": "Rotlintstr.",
+    "number": "60"
+  },
+  {
+    "stadtteil": "Nordend-West",
+    "street": "Oeder Weg",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Nordweststadt",
+    "street": "Lübecker Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Nordweststadt",
+    "street": "Walter-Kolb-Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Oberrad",
+    "street": "Seehofstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Ostend",
+    "street": "Hanauer Landstr.",
+    "number": "150"
+  },
+  {
+    "stadtteil": "Praunheim",
+    "street": "Solmsstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Preungesheim",
+    "street": "Preungesheimer Weg",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Riederwald",
+    "street": "Riederwaldstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Rödelheim",
+    "street": "Rödelheimer Bahnweg",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Sachsenhausen-Nord",
+    "street": "Schweizer Str.",
+    "number": "45"
+  },
+  {
+    "stadtteil": "Sachsenhausen-Süd",
+    "street": "Mörfelder Landstr.",
+    "number": "20"
+  },
+  {
+    "stadtteil": "Schwanheim",
+    "street": "Schwanheimer Bahnstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Seckbach",
+    "street": "Seckbacher Landstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Sindlingen",
+    "street": "Sindlinger Bahnstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Sossenheim",
+    "street": "Sossenheimer Riedstr.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Unterliederbach",
+    "street": "Liederbacher Str.",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Westend-Nord",
+    "street": "Westendstr.",
+    "number": "100"
+  },
+  {
+    "stadtteil": "Westend-Süd",
+    "street": "Grüneburgweg",
+    "number": "1"
+  },
+  {
+    "stadtteil": "Zeilsheim",
+    "street": "Pfaffenwiese",
+    "number": "1"
+  }
+]

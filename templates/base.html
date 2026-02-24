@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sperrmüll-Termine Frankfurt{% endblock %}</title>
+    <meta name="description" content="Wann wird bei Ihnen Sperrmüll abgeholt? Adresse eingeben – Abholtag und nächste Termine für Frankfurt am Main.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    colors: { primary: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' } }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="h-full bg-slate-50 font-sans text-slate-800 antialiased">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between gap-6 py-3">
+                <a href="{{ url_for('index') }}" class="flex items-center gap-3 group min-w-0">
+                    <img src="{{ url_for('static', filename='logo.svg') }}"
+                         alt="Sperrmüll Frankfurt Logo"
+                         class="h-11 w-11 shrink-0"
+                         width="44" height="44">
+                    <div class="min-w-0">
+                        <div class="text-lg sm:text-xl font-bold text-slate-900 leading-tight group-hover:text-primary-600 transition-colors">
+                            Sperrmüll Frankfurt
+                        </div>
+                        <div class="text-xs text-slate-500 leading-tight hidden sm:block">Abholtermine für Frankfurt am Main</div>
+                    </div>
+                </a>
+                <nav class="flex items-center gap-1 shrink-0" aria-label="Hauptnavigation">
+                    <a href="{{ url_for('index') }}"
+                       class="px-3.5 py-2 rounded-lg text-sm font-medium whitespace-nowrap
+                              {% if request.endpoint == 'index' %}bg-primary-100 text-primary-700{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}
+                              transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1">
+                        Adresse suchen
+                    </a>
+                    <a href="{{ url_for('termine') }}"
+                       class="px-3.5 py-2 rounded-lg text-sm font-medium whitespace-nowrap
+                              {% if request.endpoint == 'termine' %}bg-primary-100 text-primary-700{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}
+                              transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1">
+                        Stadtteile
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-slate-200 mt-16 py-8 text-center text-sm text-slate-500 bg-white">
+        <div class="max-w-3xl mx-auto px-4">
+            <p>Termine für Frankfurt am Main · Daten von der <a href="https://www.fes-frankfurt.de/services/sperrmuell" target="_blank" rel="noopener" class="underline hover:text-slate-700">FES</a>, regelmäßig aktualisiert.</p>
+        </div>
+    </footer>
+</body>
+</html>

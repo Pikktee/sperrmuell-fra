@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Adresse nachschlagen – Sperrmüll Frankfurt{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Adresse nachschlagen</h1>
+    <p class="text-slate-600">Geben Sie Straße und Hausnummer ein – wir zeigen Ihnen den Abholtag und die nächsten Sperrmüll-Termine für diese Adresse.</p>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200 p-6 mb-8 shadow-sm">
+    <form method="get" action="{{ url_for('address_lookup') }}" class="space-y-4" id="lookup-form">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="sm:col-span-2 relative">
+                <label for="street" class="block text-sm font-medium text-slate-700 mb-2">Straße</label>
+                <input type="text" name="street" id="street" value="{{ street }}"
+                       placeholder="z.B. Westendstr."
+                       autocomplete="off"
+                       class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <ul id="street-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10 hidden" role="listbox" aria-label="Straßenvorschläge"></ul>
+            </div>
+            <div class="relative">
+                <label for="housenumber" class="block text-sm font-medium text-slate-700 mb-2">Hausnummer</label>
+                <input type="text" name="housenumber" id="housenumber" value="{{ housenumber }}"
+                       placeholder="z.B. 100"
+                       autocomplete="off"
+                       class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <ul id="housenumber-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto z-10 hidden" role="listbox" aria-label="Hausnummernvorschläge"></ul>
+            </div>
+        </div>
+        <p class="text-sm text-slate-500">Straße auswählen – Vorschläge erscheinen beim Tippen (wie bei der FES).</p>
+        <button type="submit" class="px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-sm">
+            Abholtag anzeigen
+        </button>
+    </form>
+</div>
+
+<script>
+(function() {
+    const streetInput = document.getElementById('street');
+    const streetList = document.getElementById('street-suggestions');
+    const housenumberInput = document.getElementById('housenumber');
+    const housenumberList = document.getElementById('housenumber-suggestions');
+
+    let streetDebounce = null;
+    let housenumberDebounce = null;
+
+    function showStreetSuggestions(items) {
+        streetList.innerHTML = '';
+        if (!items.length) { streetList.classList.add('hidden'); return; }
+        items.forEach(function(name) {
+            const li = document.createElement('li');
+            li.textContent = name;
+            li.setAttribute('role', 'option');
+            li.className = 'px-4 py-2 cursor-pointer hover:bg-primary-50 text-slate-800';
+            li.addEventListener('click', function() {
+                streetInput.value = name;
+                streetList.classList.add('hidden');
+                streetList.innerHTML = '';
+                housenumberInput.focus();
+                loadHousenumbers(name);
+            });
+            streetList.appendChild(li);
+        });
+        streetList.classList.remove('hidden');
+    }
+
+    function showHousenumberSuggestions(items) {
+        housenumberList.innerHTML = '';
+        if (!items.length) { housenumberList.classList.add('hidden'); return; }
+        items.forEach(function(num) {
+            const li = document.createElement('li');
+            li.textContent = num;
+            li.setAttribute('role', 'option');
+            li.className = 'px-4 py-2 cursor-pointer hover:bg-primary-50 text-slate-800';
+            li.addEventListener('click', function() {
+                housenumberInput.value = num;
+                housenumberList.classList.add('hidden');
+                housenumberList.innerHTML = '';
+            });
+            housenumberList.appendChild(li);
+        });
+        housenumberList.classList.remove('hidden');
+    }
+
+    function loadStreets(q) {
+        if (q.length < 2) { showStreetSuggestions([]); return; }
+        fetch('{{ url_for("api_streets") }}?q=' + encodeURIComponent(q))
+            .then(function(r) { return r.json(); })
+            .then(function(data) { showStreetSuggestions(data.streets || []); })
+            .catch(function() { showStreetSuggestions([]); });
+    }
+
+    function loadHousenumbers(street) {
+        if (!street) { showHousenumberSuggestions([]); return; }
+        fetch('{{ url_for("api_housenumbers") }}?street=' + encodeURIComponent(street))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var list = data.housenumbers || [];
+                var q = housenumberInput.value.trim().toLowerCase();
+                if (q) list = list.filter(function(n) { return String(n).toLowerCase().indexOf(q) !== -1; });
+                showHousenumberSuggestions(list);
+            })
+            .catch(function() { showHousenumberSuggestions([]); });
+    }
+
+    streetInput.addEventListener('input', function() {
+        clearTimeout(streetDebounce);
+        var q = streetInput.value.trim();
+        streetDebounce = setTimeout(function() { loadStreets(q); }, 280);
+    });
+    streetInput.addEventListener('focus', function() {
+        var q = streetInput.value.trim();
+        if (q.length >= 2) loadStreets(q);
+    });
+    streetInput.addEventListener('blur', function() {
+        setTimeout(function() { streetList.classList.add('hidden'); }, 200);
+    });
+
+    housenumberInput.addEventListener('focus', function() {
+        var s = streetInput.value.trim();
+        if (s) loadHousenumbers(s);
+    });
+    housenumberInput.addEventListener('input', function() {
+        clearTimeout(housenumberDebounce);
+        var s = streetInput.value.trim();
+        housenumberDebounce = setTimeout(function() {
+            if (!s) { showHousenumberSuggestions([]); return; }
+            loadHousenumbers(s);
+        }, 280);
+    });
+    housenumberInput.addEventListener('blur', function() {
+        setTimeout(function() { housenumberList.classList.add('hidden'); }, 200);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!streetList.contains(e.target) && e.target !== streetInput) streetList.classList.add('hidden');
+        if (!housenumberList.contains(e.target) && e.target !== housenumberInput) housenumberList.classList.add('hidden');
+    });
+})();
+</script>
+
+{% if lookup_result %}
+<div class="mt-8">
+    {% if lookup_result.success %}
+    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-emerald-900 mb-2">Ergebnis für {{ lookup_result.street }} {{ lookup_result.housenumber }}</h2>
+        {% if lookup_result.is_siedlungsabfuhr %}
+        <p class="text-emerald-800 font-medium mb-2">Siedlungsabfuhr – fester Sperrmüllplatz, Abholung alle vier Wochen.</p>
+        <p class="text-emerald-800"><strong>Nächste Abholtermine:</strong></p>
+        <p class="text-emerald-800 mt-1">
+            {% for d in lookup_result.next_dates %}
+            {{ d | short_date }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% if lookup_result.zip_code %}
+        <p class="text-emerald-700 text-sm mt-2">PLZ {{ lookup_result.zip_code }}</p>
+        {% endif %}
+        {% else %}
+        <p class="text-emerald-800 font-medium mb-2">Sperrmüll wird <strong>{{ lookup_result.weekday_name }}s</strong> abgeholt.</p>
+        <p class="text-emerald-800"><strong>Nächste Abholtermine:</strong></p>
+        <p class="text-emerald-800 mt-1">
+            {% for d in lookup_result.next_dates %}
+            {{ d | short_date }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% if lookup_result.zip_code %}
+        <p class="text-emerald-700 text-sm mt-2">PLZ {{ lookup_result.zip_code }}</p>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-amber-900 mb-2">Kein Ergebnis für {{ lookup_result.street }} {{ lookup_result.housenumber }}</h2>
+        <p class="text-amber-800">{{ lookup_result.error }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="mt-8 text-sm text-slate-500">
+    <p>Die Termine kommen von der FES (Frankfurter Entsorgungs-Service). Bei Abweichungen oder Fragen: FES-Servicetelefon 0800 2008007-10.</p>
+</div>
+{% endblock %}
